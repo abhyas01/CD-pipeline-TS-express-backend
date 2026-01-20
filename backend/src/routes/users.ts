@@ -11,6 +11,7 @@ userRouter.get("/todos", async (_req: Request, res: Response) => {
     );
     res.json(rows);
   } catch (err) {
+    console.error("GET /todos failed:", err);
     res.status(500).json({ message: "Failed to fetch todos" });
   }
 });
