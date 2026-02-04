@@ -9,9 +9,12 @@ export const options = {
     { duration: "20s", target: 10 },
     { duration: "10s", target: 0 },
   ],
+
+  // <1% failures
+  // 95% under 300ms
   thresholds: {
-    http_req_failed: ["rate<0.01"], // <1% failures
-    http_req_duration: ["p(95)<300"], // 95% under 300ms
+    http_req_failed: ["rate<0.01"],
+    http_req_duration: ["p(95)<300"],
   },
 };
 
