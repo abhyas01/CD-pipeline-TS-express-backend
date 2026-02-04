@@ -4,6 +4,7 @@ pipeline {
   tools { nodejs 'node-20' }
 
   environment {
+    BASE_URL="http://127.0.0.1"
     PORT = '8080'
     MYSQL_ROOT_PASSWORD = 'rootpw'
     MYSQL_DATABASE = 'todo_db'
@@ -102,7 +103,7 @@ pipeline {
 
           npm ci
 
-          BASE_URL="http://127.0.0.1" npm run e2e
+          npm run e2e
 
           tar -czf "artifacts/playwright-report-${BRANCH_SAFE}-${DOCKER_TAG}.tgz" playwright-report
 
