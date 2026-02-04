@@ -196,7 +196,7 @@ pipeline {
       script {
         def version = fileExists('artifacts/VERSION.txt') ? readFile('artifacts/VERSION.txt').trim() : 'N/A'
         emailext(
-          to: 'YOUR_EMAIL@domain.com',
+          to: 'mall.abhyas11@gmail.com',
           subject: "SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER} (${env.BRANCH_NAME})",
           mimeType: 'text/html',
           body: """
@@ -216,7 +216,7 @@ pipeline {
       script {
         def version = fileExists('artifacts/VERSION.txt') ? readFile('artifacts/VERSION.txt').trim() : 'N/A'
         emailext(
-          to: 'YOUR_EMAIL@domain.com',
+          to: 'mall.abhyas11@gmail.com',
           subject: "FAILURE: ${env.JOB_NAME} #${env.BUILD_NUMBER} (${env.BRANCH_NAME})",
           mimeType: 'text/html',
           body: """
@@ -234,8 +234,8 @@ pipeline {
 
     unstable {
       emailext(
-        to: 'YOUR_EMAIL@domain.com',
-        subject: "⚠️ UNSTABLE: ${env.JOB_NAME} #${env.BUILD_NUMBER} (${env.BRANCH_NAME})",
+        to: 'mall.abhyas11@gmail.com',
+        subject: "UNSTABLE: ${env.JOB_NAME} #${env.BUILD_NUMBER} (${env.BRANCH_NAME})",
         mimeType: 'text/html',
         body: """
           <p><b>Status:</b> UNSTABLE</p>
