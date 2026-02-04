@@ -28,18 +28,6 @@ pipeline {
       }
     }
 
-    stage('Build Images') {
-      steps {
-        sh '''
-          set -eu
-          source artifacts/version.env
-
-          docker build -t "todo-web:${DOCKER_TAG}" ./backend
-          docker build -t "todo-nginx:${DOCKER_TAG}" ./nginx
-        '''
-      }
-    }
-
     stage('SonarQube Analysis') {
       steps {
         script {
@@ -64,6 +52,18 @@ pipeline {
         timeout(time: 5, unit: 'MINUTES') {
           waitForQualityGate abortPipeline: true
         }
+      }
+    }
+
+    stage('Build Images') {
+      steps {
+        sh '''
+          set -eu
+          source artifacts/version.env
+
+          docker build -t "todo-web:${DOCKER_TAG}" ./backend
+          docker build -t "todo-nginx:${DOCKER_TAG}" ./nginx
+        '''
       }
     }
 
