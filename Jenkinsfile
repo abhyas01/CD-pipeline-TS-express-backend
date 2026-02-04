@@ -138,8 +138,8 @@ pipeline {
           curl -fsS "http://127.0.0.1/api/v1/public/health" >/dev/null
 
           mkdir -p artifacts
-          /opt/homebrew/bin/k6 run performance/todos.k6.js | tee artifacts/k6-output.txt
-          /opt/homebrew/bin/k6 run --summary-export=artifacts/k6-summary.json performance/todos.k6.js
+          BASE_URL="$BASE_URL" /opt/homebrew/bin/k6 run performance/todos.k6.js | tee artifacts/k6-output.txt
+          BASE_URL="$BASE_URL" /opt/homebrew/bin/k6 run --summary-export=artifacts/k6-summary.json performance/todos.k6.js
         '''
       }
       post {
