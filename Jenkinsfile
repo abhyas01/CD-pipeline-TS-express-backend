@@ -3,6 +3,19 @@ pipeline {
 
   tools { nodejs 'node-20' }
 
+  environment {
+    PORT = '8080'
+    MYSQL_ROOT_PASSWORD = 'rootpw'
+    MYSQL_DATABASE = 'todo_db'
+    MYSQL_USER = 'abhyas_user'
+    MYSQL_PASSWORD = 'abhyas_password'
+    DB_HOST = 'db'
+    DB_PORT = '3306'
+    DB_USER = 'abhyas_user'
+    DB_PASSWORD = 'abhyas_password'
+    DB_NAME = 'todo_db'
+  }
+
   stages {
     stage('Prepare Version') {
       steps {
@@ -98,7 +111,7 @@ pipeline {
       }
       post {
         always {
-          sh 'docker compose down -v || true'
+          sh 'docker compose down -v --remove-orphans || true'
         }
       }
     }
@@ -112,6 +125,27 @@ pipeline {
           docker save "todo-web:${DOCKER_TAG}" | gzip > "artifacts/todo-web-${BRANCH_SAFE}-${DOCKER_TAG}.tar.gz"
           docker save "todo-nginx:${DOCKER_TAG}" | gzip > "artifacts/todo-nginx-${BRANCH_SAFE}-${DOCKER_TAG}.tar.gz"
 
+          ls -lh artifacts
+        '''
+      }
+    }
+    
+    stage('Package Deployment Bundle') {
+      steps {
+        sh '''
+          set -eu
+          source artifacts/version.env
+
+          mkdir -p artifacts/deploy
+
+          cp docker-compose.yml artifacts/deploy/
+          cp .env.example artifacts/deploy/ || true
+          cp -r db artifacts/deploy/
+
+          cp "artifacts/todo-web-${BRANCH_SAFE}-${DOCKER_TAG}.tar.gz" artifacts/deploy/
+          cp "artifacts/todo-nginx-${BRANCH_SAFE}-${DOCKER_TAG}.tar.gz" artifacts/deploy/
+
+          tar -czf "artifacts/deploy-bundle-${BRANCH_SAFE}-${DOCKER_TAG}.tgz" -C artifacts deploy
           ls -lh artifacts
         '''
       }
