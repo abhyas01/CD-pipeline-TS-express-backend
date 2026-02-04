@@ -117,7 +117,7 @@ pipeline {
       }
     }
 
-    stage('Performance Tests (k6)') {
+    stage('Performance Tests') {
       steps {
         sh '''
           set -eu
