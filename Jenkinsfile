@@ -192,57 +192,73 @@ pipeline {
   }
 
   post {
-    success {
-      script {
-        def version = fileExists('artifacts/VERSION.txt') ? readFile('artifacts/VERSION.txt').trim() : 'N/A'
-        emailext(
-          to: 'mall.abhyas11@gmail.com',
-          subject: "SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER} (${env.BRANCH_NAME})",
-          mimeType: 'text/html',
-          body: """
-            <p><b>Status:</b> SUCCESS</p>
-            <p><b>Job:</b> ${env.JOB_NAME}</p>
-            <p><b>Build:</b> #${env.BUILD_NUMBER}</p>
-            <p><b>Branch:</b> ${env.BRANCH_NAME}</p>
-            <p><b>Version:</b> ${version}</p>
-            <p><b>Build URL:</b> <a href="${env.BUILD_URL}">${env.BUILD_URL}</a></p>
-            <p><b>Artifacts:</b> <a href="${env.BUILD_URL}artifact/">Open artifacts</a></p>
-          """
-        )
-      }
-    }
-
     failure {
       script {
-        def version = fileExists('artifacts/VERSION.txt') ? readFile('artifacts/VERSION.txt').trim() : 'N/A'
-        emailext(
-          to: 'mall.abhyas11@gmail.com',
-          subject: "FAILURE: ${env.JOB_NAME} #${env.BUILD_NUMBER} (${env.BRANCH_NAME})",
-          mimeType: 'text/html',
-          body: """
-            <p><b>Status:</b> FAILURE</p>
-            <p><b>Job:</b> ${env.JOB_NAME}</p>
-            <p><b>Build:</b> #${env.BUILD_NUMBER}</p>
-            <p><b>Branch:</b> ${env.BRANCH_NAME}</p>
-            <p><b>Version:</b> ${version}</p>
-            <p><b>Build URL:</b> <a href="${env.BUILD_URL}">${env.BUILD_URL}</a></p>
-            <p><b>Console:</b> <a href="${env.BUILD_URL}console">${env.BUILD_URL}console</a></p>
-          """
-        )
+        mail to: 'mall.abhyas11@gmail.com',
+            subject: "FAILED: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+            body: """
+              Build FAILED
+
+              Job: ${env.JOB_NAME}
+              Build: #${env.BUILD_NUMBER}
+              Result: ${currentBuild.currentResult}
+              Branch: ${env.BRANCH_NAME ?: 'N/A'}
+
+              Build URL:
+              ${env.BUILD_URL}
+
+              Console (error details):
+              ${env.BUILD_URL}console
+
+              Blue Ocean:
+              ${env.RUN_DISPLAY_URL}
+            """
+        }
+      }
+
+    success {
+      script {
+        mail to: 'mall.abhyas11@gmail.com',
+            subject: "SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+            body: """
+              Build SUCCESSFUL
+
+              Job: ${env.JOB_NAME}
+              Build: #${env.BUILD_NUMBER}
+              Result: ${currentBuild.currentResult}
+              Branch: ${env.BRANCH_NAME ?: 'N/A'}
+
+              Build URL:
+              ${env.BUILD_URL}
+
+              Blue Ocean:
+              ${env.RUN_DISPLAY_URL}
+              """
       }
     }
 
-    unstable {
-      emailext(
-        to: 'mall.abhyas11@gmail.com',
-        subject: "UNSTABLE: ${env.JOB_NAME} #${env.BUILD_NUMBER} (${env.BRANCH_NAME})",
-        mimeType: 'text/html',
-        body: """
-          <p><b>Status:</b> UNSTABLE</p>
-          <p><b>Build URL:</b> <a href="${env.BUILD_URL}">${env.BUILD_URL}</a></p>
-          <p><b>Console:</b> <a href="${env.BUILD_URL}console">${env.BUILD_URL}console</a></p>
-        """
-      )
+    aborted {
+      script {
+        mail to: 'mall.abhyas11@gmail.com',
+            subject: "ABORTED: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+            body: """
+              Build ABORTED
+
+              Job: ${env.JOB_NAME}
+              Build: #${env.BUILD_NUMBER}
+              Result: ${currentBuild.currentResult}
+              Branch: ${env.BRANCH_NAME ?: 'N/A'}
+
+              Build URL:
+              ${env.BUILD_URL}
+
+              Console:
+              ${env.BUILD_URL}console
+
+              Blue Ocean:
+              ${env.RUN_DISPLAY_URL}
+              """
+      }
     }
   }
 }
