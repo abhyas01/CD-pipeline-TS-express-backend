@@ -4,6 +4,8 @@ node_modules/
 # Build and distribution directories
 dist/
 dist-ssr/
+playwright-report/
+test-results/
 
 # Environment files
 .env

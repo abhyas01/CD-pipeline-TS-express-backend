@@ -67,6 +67,42 @@ pipeline {
       }
     }
 
+    stage('E2E Tests') {
+      steps {
+        sh '''
+          set -eu
+          source artifacts/version.env
+
+          docker compose up -d --build
+
+          for i in $(seq 1 30); do
+            if curl -fsS "http://127.0.0.1/api/v1/public/health" >/dev/null; then
+              echo "Staging is healthy"
+              break
+            fi
+
+            echo "Waiting for staging health... ($i/30)"
+            sleep 2
+          done
+
+          curl -fsS "http://127.0.0.1/api/v1/public/health" >/dev/null
+
+          npm ci
+
+          BASE_URL="http://127.0.0.1" npm run e2e
+
+          tar -czf "artifacts/playwright-report-${BRANCH_SAFE}-${DOCKER_TAG}.tgz" playwright-report
+
+          ls -lh artifacts
+        '''
+      }
+      post {
+        always {
+          sh 'docker compose down -v || true'
+        }
+      }
+    }
+
     stage('Package Artifacts') {
       steps {
         sh '''

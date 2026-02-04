@@ -1,0 +1,24 @@
+{
+  "name": "nginx-docker-todo-app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "e2e": "playwright test",
+    "e2e:report": "playwright show-report"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/abhyas01/CD-pipeline-TS-express-backend.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/abhyas01/CD-pipeline-TS-express-backend/issues"
+  },
+  "homepage": "https://github.com/abhyas01/CD-pipeline-TS-express-backend#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.58.1"
+  }
+}
