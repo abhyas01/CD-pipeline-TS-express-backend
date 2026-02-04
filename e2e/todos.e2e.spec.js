@@ -1,6 +1,8 @@
 const { test, expect } = require("@playwright/test");
 
-const BASE = "http://localhost";
+require("dotenv").config();
+
+const BASE = process.env.BASE_URL;
 
 test("E2E: create and delete a todo via NGINX -> API -> MySQL", async ({
   request,

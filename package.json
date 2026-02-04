@@ -20,5 +20,8 @@
   "homepage": "https://github.com/abhyas01/CD-pipeline-TS-express-backend#readme",
   "devDependencies": {
     "@playwright/test": "^1.58.1"
+  },
+  "dependencies": {
+    "dotenv": "^17.2.3"
   }
 }
