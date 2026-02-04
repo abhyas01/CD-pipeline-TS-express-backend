@@ -1,28 +1,55 @@
 pipeline {
     agent any
-    // TRIGGER WEBHOOOK
+
     stages {
-        stage('Info') {
+        stage('Prepare Version') {
             steps {
-                echo "Branch: ${env.BRANCH_NAME}"
+                sh '''
+                set -eu
+                mkdir -p artifacts
+
+                BASE_VERSION=$(node -p "require('./backend/package.json').version")
+                GIT_SHA=$(git rev-parse --short HEAD)
+                BRANCH_SAFE=$(echo "${BRANCH_NAME:-unknown}" | tr '/' '-')
+
+                VERSION="${BASE_VERSION}+build.${BUILD_NUMBER}.${GIT_SHA}"
+                echo "${VERSION}" | tee artifacts/VERSION.txt
+
+                echo "VERSION=${VERSION}" > artifacts/version.env
+                echo "BRANCH_SAFE=${BRANCH_SAFE}" >> artifacts/version.env
+                '''
             }
         }
 
-        stage('Main Branch Steps') {
-            when { branch 'main' }
+        stage('Build Images') {
             steps {
-                echo "Running MAIN-ONLY stage steps"
-                sh 'echo main work here'
+                sh '''
+                set -eu
+                source artifacts/version.env
+
+                docker build -t "todo-web:${VERSION}" ./backend
+                docker build -t "todo-nginx:${VERSION}" ./nginx
+                '''
             }
         }
 
-        stage('Feature Branch Steps') {
-            when {
-                not { branch 'main' }
-            }
+        stage('Package Artifacts') {
             steps {
-                echo "Running FEATURE-ONLY stage steps"
-                sh 'echo feature work here'
+                sh '''
+                set -eu
+                source artifacts/version.env
+
+                docker save "todo-web:${VERSION}" | gzip > "artifacts/todo-web-${BRANCH_SAFE}-${VERSION}.tar.gz"
+                docker save "todo-nginx:${VERSION}" | gzip > "artifacts/todo-nginx-${BRANCH_SAFE}-${VERSION}.tar.gz"
+
+                ls -lh artifacts
+                '''
+            }
+        }
+
+        stage('Archive Artifacts') {
+            steps {
+                archiveArtifacts artifacts: 'artifacts/*', fingerprint: true
             }
         }
     }
