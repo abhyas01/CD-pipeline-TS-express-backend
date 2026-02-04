@@ -117,6 +117,39 @@ pipeline {
       }
     }
 
+    stage('Performance Tests (k6)') {
+      steps {
+        sh '''
+          set -eu
+          source artifacts/version.env
+
+          docker compose up -d --build
+
+          for i in $(seq 1 30); do
+            if curl -fsS "http://127.0.0.1/api/v1/public/health" >/dev/null; then
+              echo "Staging is healthy"
+              break
+            fi
+
+            echo "Waiting for staging health... ($i/30)"
+            sleep 2
+          done
+
+          curl -fsS "http://127.0.0.1/api/v1/public/health" >/dev/null
+
+          mkdir -p artifacts
+          BASE_URL="http://127.0.0.1" k6 run performance/todos.k6.js | tee artifacts/k6-output.txt
+
+          BASE_URL="http://127.0.0.1" k6 run --summary-export=artifacts/k6-summary.json performance/todos.k6.js
+        '''
+      }
+      post {
+        always {
+          sh 'docker compose down -v --remove-orphans || true'
+        }
+      }
+    }
+
     stage('Package Artifacts') {
       steps {
         sh '''

@@ -1,6 +1,5 @@
 import express from "express";
 import cors from "cors";
-import { userRateLimiter } from "./limiters/rateLimiter.js";
 import { PORT } from "./configs/config.js";
 import type { Application, Request, Response, RequestHandler } from "express";
 import publicRouter from "./routes/public.js";
@@ -21,8 +20,6 @@ app.use(express.json({ limit: "100kb" }) as RequestHandler);
 app.use(
   express.urlencoded({ extended: true, limit: "100kb" }) as RequestHandler,
 );
-
-app.use("/api/v1/users", userRateLimiter as RequestHandler);
 
 app.use("/api/v1/public", publicRouter as RequestHandler);
 app.use("/api/v1/users", userRouter as RequestHandler);
