@@ -42,21 +42,19 @@ pipeline {
 
     stage('SonarQube Analysis') {
       steps {
-        withSonarQubeEnv(installationName: 'sq1') {
-          sh '''
-            set -eu
-
-            # If sonar-scanner is installed as a Jenkins tool, call it like:
-            # sonar-scanner ...
-            # Otherwise you must have sonar-scanner on PATH.
-
-            sonar-scanner \
-              -Dsonar.projectKey=cd-pipeline-ts-express-backend \
-              -Dsonar.projectName=cd-pipeline-ts-express-backend \
-              -Dsonar.sources=backend/src \
-              -Dsonar.exclusions=**/node_modules/**,**/dist/** \
-              -Dsonar.sourceEncoding=UTF-8
-          '''
+        script {
+          def scannerHome = tool 'SonarScanner'
+          withSonarQubeEnv('sq1') {
+            sh """
+              set -eu
+              ${scannerHome}/bin/sonar-scanner \
+                -Dsonar.projectKey=cd-pipeline-ts-express-backend \
+                -Dsonar.projectName=cd-pipeline-ts-express-backend \
+                -Dsonar.sources=backend/src \
+                -Dsonar.exclusions=**/node_modules/**,**/dist/** \
+                -Dsonar.sourceEncoding=UTF-8
+            """
+          }
         }
       }
     }
